@@ -17,11 +17,13 @@ namespace SFTP.Wrapper
     {
         private readonly SftpConfig _config;
         private readonly ILogger<SftpManager> _logger;
+        private readonly bool _isLoggingEnabled = false;
 
-        public SftpManager(SftpConfig config, ILogger<SftpManager> logger)
+        public SftpManager(SftpConfig config, ILogger<SftpManager> logger = null)
         {
             _config = config ?? throw new ArgumentNullException();
             _logger = logger;
+            _isLoggingEnabled = _logger != null;
         }
 
         public virtual async Task<ResultStatus<GetAllFilesResponse>> GetAllFilesAsync(GetAllFilesRequest request)
@@ -136,19 +138,19 @@ namespace SFTP.Wrapper
 
             if (!isValid)
             {
-                _logger.LogError("Invalid request");
+                Log(LogLevel.Error, "Invalid Request");
                 return ResultStatus<TResponse>.Error("Invalid request");
             }
 
             if (operation == null)
             {
-                _logger.LogError("Please specify the operation to handle");
+                Log(LogLevel.Error, "Please specify the operation to handle");
                 return ResultStatus<TResponse>.Error("Please specify the response to handle");
             }
 
             if (string.IsNullOrWhiteSpace(nameOfOperation))
             {
-                _logger.LogError("Please specify a name for the operation");
+                Log(LogLevel.Error, "Please specify a name for the operation");
                 return ResultStatus<TResponse>.Error("Please specify a name for the operation");
             }
 
@@ -161,13 +163,13 @@ namespace SFTP.Wrapper
                         client.Connect();
 
                         var response = await operation(client, request).ConfigureAwait(false);
-                        _logger.LogInformation($"{nameOfOperation} executed successfully");
+                        Log(LogLevel.Information, $"{nameOfOperation} executed successfully");
                         return ResultStatus<TResponse>.Success(response);
                     }
                     catch (Exception exception)
                     {
                         var message = exception.Message ?? $"Error occured in {nameOfOperation}";
-                        _logger.LogError(message);
+                        Log(LogLevel.Error, message);
                         return ResultStatus<TResponse>.Error(message, exception);
                     }
                     finally
@@ -179,8 +181,43 @@ namespace SFTP.Wrapper
             catch (Exception exception)
             {
                 var message = exception.Message ?? "Cannot connect to the SFTP host";
-                _logger.LogError(message);
+                Log(LogLevel.Error, message);
                 return ResultStatus<TResponse>.Error(message, exception);
+            }
+        }
+
+        private void Log(LogLevel level, string message)
+        {
+            if (_isLoggingEnabled && !string.IsNullOrWhiteSpace(message))
+            {
+                return;
+            }
+
+            switch (level)
+            {
+                case LogLevel.Critical:
+                    _logger.LogCritical(message);
+                    break;
+
+                case LogLevel.Debug:
+                    _logger.LogDebug(message);
+                    break;
+                case LogLevel.Error:
+                    _logger.LogDebug(message);
+                    break;
+                case LogLevel.Information:
+                    _logger.LogInformation(message);
+                    break;
+                case LogLevel.Trace:
+                    _logger.LogTrace(message);
+                    break;
+                case LogLevel.Warning:
+                    _logger.LogWarning(message);
+                    break;
+
+                default:
+                    _logger.LogInformation(message);
+                    break;
             }
         }
     }
