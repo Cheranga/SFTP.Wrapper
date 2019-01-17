@@ -13,6 +13,8 @@
     <PackageReleaseNotes>* Updated the project and repository URLs.
 * Included "Readme.md" file which instructs on how to use the package.
 </PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/Cheranga/SFTP.Wrapper/tree/master/SFTP.Wrapper</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Cheranga/SFTP.Wrapper/tree/master/SFTP.Wrapper</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
