@@ -1,6 +1,6 @@
 ﻿namespace SFTP.Wrapper
 {
-    internal interface IValidatable
+    public interface IValidatable
     {
         bool IsValid();
     }

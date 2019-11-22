@@ -13,7 +13,7 @@ using SFTP.Wrapper.Responses;
 
 namespace SFTP.Wrapper
 {
-    internal class SftpManager : ISftpManager
+    public class SftpManager : ISftpManager
     {
         private readonly SftpConfig _config;
         private readonly ILogger<SftpManager> _logger;
@@ -21,7 +21,7 @@ namespace SFTP.Wrapper
 
         public SftpManager(SftpConfig config, ILogger<SftpManager> logger = null)
         {
-            _config = config ?? throw new ArgumentNullException();
+            _config = config ?? throw new ArgumentNullException(nameof(config), "Config cannot be null");
             _logger = logger;
             _isLoggingEnabled = _logger != null;
         }
