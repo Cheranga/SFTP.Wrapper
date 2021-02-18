@@ -77,6 +77,7 @@ namespace SFTP.Wrapper
                             client.EndDownloadFile(result);
                             if (result.IsCompleted)
                             {
+                                stream.Position = 0;
                                 downloadedFileResponses.Add(new DownloadFileResponse
                                 {
                                     Stream = stream,
@@ -121,6 +122,7 @@ namespace SFTP.Wrapper
 
         public virtual async Task<ResultStatus<UploadFileResponse>> UploadFileAsync(UploadFileRequest request)
         {
+            request.StreamToUpload.Position = 0;
             var response = await HandleAsync(async (client, req) =>
             {
                 await Task.Factory.FromAsync(client.BeginUploadFile(request.StreamToUpload, request.WhereToUpload), client.EndUploadFile).ConfigureAwait(false);
